@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genel Rapor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .page-break {
+            page-break-before: always;
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            margin-bottom: 1rem;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        td, th {
+            padding: 8px;
+            vertical-align: middle !important;
+        }
+        h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <!-- Kadro Talepleri Tablosu -->
+        <div class="row">
+            <div class="col-12">
+                <h3 class="text-center">KADRO TALEPLERİ TABLOSU</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Birim</th>
+                            <th>Bölüm</th>
+                            <th>Anabilim Dalı</th>
+                            <th>Unvan</th>
+                            <th>Derece</th>
+                            <th>Kadro No</th>
+                            <th>Kadro Türü</th>
+                            <th>Norm Durumu</th>
+                            <th>İşlem Durumu</th>
+                            <th>YÖK Onay Durumu</th>
+                            <th>Fakülte Yönetim Kurulu Yazısı</th>
+                            <th>ÜYK-Senato Talep Yazısı</th>
+                            <th>ÜYK-Senato Onay Yazısı</th>
+                            <th>ÜYK-Senato Karar Numarası</th>
+                            <th>YÖK Kadro Talep Yazısı</th>
+                            <th>YÖKSİS Form No</th>
+                            <th>YÖK İzin/Red Yazısı</th>
+                            <th>İlan Tarihi</th>
+                            <th>Adı Soyadı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for talep in kadro_talepleri %}
+                        <tr>
+                            <td>{{ talep.birim.ad }}</td>
+                            <td>{{ talep.bolum.ad }}</td>
+                            <td>{{ talep.anabilim_dali.ad }}</td>
+                            <td>{{ talep.unvan }}</td>
+                            <td>{{ talep.derece }}</td>
+                            <td>{{ talep.kadro_no }}</td>
+                            <td>{{ talep.kadro_turu }}</td>
+                            <td>{{ talep.norm_durumu }}</td>
+                            <td>{{ talep.islem_durumu }}</td>
+                            <td>{{ talep.yok_onay_durumu }}</td>
+                            <td>{{ talep.fakulte_yonetim_kurulu_yazisi }}</td>
+                            <td>{{ talep.uyk_senato_talep_yazisi }}</td>
+                            <td>{{ talep.uyk_senato_onay_yazisi }}</td>
+                            <td>{{ talep.uyk_senato_karar_numarasi }}</td>
+                            <td>{{ talep.yok_kadro_talep_yazisi }}</td>
+                            <td>{{ talep.yoksis_form_no }}</td>
+                            <td>{{ talep.yok_izin_red_yazisi }}</td>
+                            <td>{{ talep.ilan_tarihi.strftime('%d.%m.%Y') if talep.ilan_tarihi else '' }}</td>
+                            <td>{{ talep.adi_soyadi }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Kontenjan Tahsis Tablosu -->
+        <div class="row page-break">
+            <div class="col-12">
+                <h3 class="text-center">KONTENJAN TAHSİS TABLOSU</h3>
+                
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Birim</th>
+                            <th>Atama Kontenjanı</th>
+                            <th>Atanan</th>
+                            <th>Kalan</th>
+                            <th>Öncelikli Alan Araştırma Görevlisi</th>
+                            <th>Atanan</th>
+                            <th>Kalan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for birim in birimler %}
+                        {% set kontenjan = birim_kontenjan.get(birim.id, {'atama_kontenjani': 0, 'atanan': 0, 'oncelikli_alan': 0, 'oncelikli_atanan': 0}) %}
+                        <tr>
+                            <td>{{ birim.ad }}</td>
+                            <td>{{ kontenjan.atama_kontenjani }}</td>
+                            <td>{{ kontenjan.atanan }}</td>
+                            <td>{{ kontenjan.atama_kontenjani - kontenjan.atanan }}</td>
+                            <td>{{ kontenjan.oncelikli_alan }}</td>
+                            <td>{{ kontenjan.oncelikli_atanan }}</td>
+                            <td>{{ kontenjan.oncelikli_alan - kontenjan.oncelikli_atanan }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Öğretim Üyesi Tablosu -->
+        <div class="row page-break">
+            <div class="col-12">
+                <h3 class="text-center">ÖĞRETİM ÜYESİ TABLOSU</h3>
+                
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Birim</th>
+                            <th>Öğretim Üyesi Sayısı</th>
+                            <th>ÜYKK-Senato</th>
+                            <th>YÖK Onay Bekleyen</th>
+                            <th>YÖK İzin Alınan</th>
+                            <th>İlanda</th>
+                            <th>Kurum İçi Atanan</th>
+                            <th>Kurum Dışı Atanan</th>
+                            <th>Cari Yıl Kontenjan</th>
+                            <th>Kalan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for birim in birimler %}
+                        {% set son_kayit = birim.son_kayit %}
+                        <tr>
+                            <td>{{ birim.ad }}</td>
+                            <td>{{ son_kayit.ogretim_uyesi_sayisi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.uykk_senato_ogretim_uyesi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.yok_onay_bekleyen_ogretim_uyesi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.yok_izin_alinan_ogretim_uyesi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.ilanda_ogretim_uyesi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.kurum_ici_atanan_ogretim_uyesi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.kurum_disi_atanan_ogretim_uyesi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.cari_yil_kontenjan if son_kayit else 0 }}</td>
+                            <td>{{ (son_kayit.cari_yil_kontenjan - (son_kayit.kurum_ici_atanan_ogretim_uyesi + son_kayit.kurum_disi_atanan_ogretim_uyesi)) if son_kayit else 0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Araştırma Görevlisi-Öğretim Görevlisi Tablosu -->
+        <div class="row page-break">
+            <div class="col-12">
+                <h3 class="text-center">ARAŞTIRMA GÖREVLİSİ-ÖĞRETİM GÖREVLİSİ TABLOSU</h3>
+                
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Birim</th>
+                            <th>Araştırma Görevlisi Sayısı</th>
+                            <th>Öğretim Görevlisi Sayısı</th>
+                            <th>ÜYKK-Senato</th>
+                            <th>YÖK Onay Bekleyen</th>
+                            <th>YÖK İzin Alınan</th>
+                            <th>İlanda</th>
+                            <th>Atanan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for birim in birimler %}
+                        {% set son_kayit = birim.son_kayit %}
+                        <tr>
+                            <td>{{ birim.ad }}</td>
+                            <td>{{ son_kayit.arastirma_gorevlisi_sayisi if son_kayit else 0 }}</td>
+                            <td>{{ son_kayit.ogretim_gorevlisi_sayisi if son_kayit else 0 }}</td>
+                            <td>{{ (son_kayit.uykk_senato_arastirma_gorevlisi + son_kayit.uykk_senato_ogretim_gorevlisi) if son_kayit else 0 }}</td>
+                            <td>{{ (son_kayit.yok_onay_bekleyen_arastirma_gorevlisi + son_kayit.yok_onay_bekleyen_ogretim_gorevlisi) if son_kayit else 0 }}</td>
+                            <td>{{ (son_kayit.yok_izin_alinan_arastirma_gorevlisi + son_kayit.yok_izin_alinan_ogretim_gorevlisi) if son_kayit else 0 }}</td>
+                            <td>{{ (son_kayit.ilanda_arastirma_gorevlisi + son_kayit.ilanda_ogretim_gorevlisi) if son_kayit else 0 }}</td>
+                            <td>{{ (son_kayit.kurum_disi_atanan_arastirma_gorevlisi + son_kayit.kurum_disi_atanan_ogretim_gorevlisi) if son_kayit else 0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadro Takip Sistemi - Bölümler</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            padding: 0.5rem 1rem;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        #navbarNav {
+            justify-content: center;
+        }
+        .navbar-nav {
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #D94F04;">
+        <div class="container">
+            <span class="navbar-brand text-white">Kadro Takip Sistemi</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('birimler') }}">Birimler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('kadro_talebi') }}">Kadro Talebi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('ozet_cizelge') }}">Özet Çizelge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('oncelikli_alan_arastirma_gorevlisi') }}">Öncelikli Alan Araştırma Görevlisi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('raporlar') }}">Raporlar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('birimler') }}">Birimler</a></li>
+                        <li class="breadcrumb-item active">{{ birim.ad }}</li>
+                    </ol>
+                </nav>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ birim.ad }} - Bölümler</h5>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bolumEkleModal">
+                            <i class="fas fa-plus"></i> Yeni Bölüm Ekle
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Bölüm Adı</th>
+                                        <th>Oluşturma Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bolum in bolumler %}
+                                    <tr>
+                                        <td>{{ bolum.id }}</td>
+                                        <td>{{ bolum.ad }}</td>
+                                        <td>{{ bolum.olusturma_tarihi.strftime('%d.%m.%Y %H:%M') }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" onclick="bolumDuzenle({{ bolum.id }}, '{{ bolum.ad }}')">
+                                                <i class="fas fa-edit"></i> Düzenle
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="bolumSil({{ bolum.id }})">
+                                                <i class="fas fa-trash"></i> Sil
+                                            </button>
+                                            <a href="/anabilim-dallari/{{ bolum.id }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-list"></i> Anabilim Dalları
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bölüm Ekle Modal -->
+    <div class="modal fade" id="bolumEkleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Bölüm Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('bolum_ekle', birim_id=birim.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="bolumAdi" class="form-label">Bölüm Adı</label>
+                            <input type="text" class="form-control" id="bolumAdi" name="ad" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bölüm Düzenle Modal -->
+    <div class="modal fade" id="bolumDuzenleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bölüm Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="bolumDuzenleForm" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="bolumAdiDuzenle" class="form-label">Bölüm Adı</label>
+                            <input type="text" class="form-control" id="bolumAdiDuzenle" name="ad" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function bolumDuzenle(id, ad) {
+            document.getElementById('bolumAdiDuzenle').value = ad;
+            document.getElementById('bolumDuzenleForm').action = `/bolum/duzenle/${id}`;
+            new bootstrap.Modal(document.getElementById('bolumDuzenleModal')).show();
+        }
+
+        function bolumSil(id) {
+            if (confirm('Bu bölümü silmek istediğinizden emin misiniz?')) {
+                fetch(`/bolum/sil/${id}`, { method: 'POST' })
+                    .then(response => window.location.reload())
+                    .catch(error => alert('Bir hata oluştu'));
+            }
+        }
+    </script>
+{% endblock %}

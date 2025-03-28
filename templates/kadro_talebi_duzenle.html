@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadro Takip Sistemi - Kadro Talebi Düzenle</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .navbar {
+            padding: 0.5rem 1rem;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        #navbarNav {
+            justify-content: center;
+        }
+        .navbar-nav {
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .form-card {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+        .form-card .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 15px 15px 0 0;
+        }
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 38px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+        .form-select {
+            border: 1px solid #dee2e6;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg" style="background-color: #D94F04;">
+        <div class="container">
+            <span class="navbar-brand text-white">Kadro Takip Sistemi</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('birimler') }}">Birimler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white active" href="{{ url_for('kadro_talebi') }}">Kadro Talebi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('ozet_cizelge') }}">Özet Çizelge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('oncelikli_alan_arastirma_gorevlisi') }}">Öncelikli Alan Araştırma Görevlisi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('raporlar') }}">Raporlar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Kadro Talebi Düzenle
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('kadro_talebi_duzenle', talep_id=talep.id) }}" method="post">
+                            <!-- Kadro Bilgileri -->
+                            <h6 class="section-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Kadro Bilgileri
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="birim_id" class="form-label">Birim</label>
+                                    <select class="form-select select2" id="birim_id" name="birim_id" required>
+                                        <option value="">Birim Seçiniz</option>
+                                        {% for birim in birimler %}
+                                        <option value="{{ birim.id }}" {% if birim.id == talep.birim_id %}selected{% endif %}>{{ birim.ad }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="bolum_id" class="form-label">Bölüm</label>
+                                    <select class="form-select select2" id="bolum_id" name="bolum_id" required>
+                                        <option value="">Bölüm Seçiniz</option>
+                                        {% for bolum in bolumler %}
+                                        <option value="{{ bolum.id }}" {% if bolum.id == talep.bolum_id %}selected{% endif %}>{{ bolum.ad }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="anabilim_dali_id" class="form-label">Anabilim Dalı</label>
+                                    <select class="form-select select2" id="anabilim_dali_id" name="anabilim_dali_id" required>
+                                        <option value="">Anabilim Dalı Seçiniz</option>
+                                        {% for anabilim_dali in anabilim_dallari %}
+                                        <option value="{{ anabilim_dali.id }}" {% if anabilim_dali.id == talep.anabilim_dali_id %}selected{% endif %}>{{ anabilim_dali.ad }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="unvan" class="form-label">Unvan</label>
+                                    <select class="form-select select2" id="unvan" name="unvan" required>
+                                        <option value="">Unvan Seçiniz</option>
+                                        {% for unvan in unvanlar %}
+                                        <option value="{{ unvan }}" {% if unvan == talep.unvan %}selected{% endif %}>{{ unvan }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="derece" class="form-label">Derece</label>
+                                    <select class="form-select select2" id="derece" name="derece" required>
+                                        <option value="">Seç</option>
+                                        {% for i in range(1, 8) %}
+                                        <option value="{{ i }}" {% if i == talep.derece %}selected{% endif %}>{{ i }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="kadro_no" class="form-label">Kadro No</label>
+                                    <input type="number" class="form-control" id="kadro_no" name="kadro_no" required min="1" value="{{ talep.kadro_no }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="kadro_turu" class="form-label">Kadro Türü</label>
+                                    <select class="form-select select2" id="kadro_turu" name="kadro_turu" required>
+                                        <option value="">Kadro Türü Seçiniz</option>
+                                        {% for tur in kadro_turleri %}
+                                        <option value="{{ tur }}" {% if talep.kadro_turu == tur %}selected{% endif %}>{{ tur }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="norm_durumu" class="form-label">Norm Durumu</label>
+                                    <select class="form-select select2" id="norm_durumu" name="norm_durumu" required>
+                                        <option value="">Norm Durumu Seçiniz</option>
+                                        {% for durum in norm_durumlari %}
+                                        <option value="{{ durum }}" {% if durum == talep.norm_durumu %}selected{% endif %}>{{ durum }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="islem_durumu" class="form-label">İşlem Durumu</label>
+                                    <select class="form-select select2" id="islem_durumu" name="islem_durumu" required>
+                                        <option value="">İşlem Durumu Seçiniz</option>
+                                        {% for durum in islem_durumlari %}
+                                        <option value="{{ durum }}" {% if durum == talep.islem_durumu %}selected{% endif %}>{{ durum }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Evrak Süreci -->
+                            <h6 class="section-title">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Evrak Süreci
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="fakulte_yonetim_kurulu_yazisi" class="form-label">Fakülte Yönetim Kurulu Yazısı</label>
+                                    <input type="text" class="form-control" id="fakulte_yonetim_kurulu_yazisi" name="fakulte_yonetim_kurulu_yazisi" value="{{ talep.fakulte_yonetim_kurulu_yazisi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="uyk_senato_talep_yazisi" class="form-label">ÜYK/Senato Talep Yazısı</label>
+                                    <input type="text" class="form-control" id="uyk_senato_talep_yazisi" name="uyk_senato_talep_yazisi" value="{{ talep.uyk_senato_talep_yazisi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="uyk_senato_onay_yazisi" class="form-label">ÜYK/Senato Onay Yazısı</label>
+                                    <input type="text" class="form-control" id="uyk_senato_onay_yazisi" name="uyk_senato_onay_yazisi" value="{{ talep.uyk_senato_onay_yazisi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="uyk_senato_karar_numarasi" class="form-label">ÜYK/Senato Karar Numarası</label>
+                                    <input type="text" class="form-control" id="uyk_senato_karar_numarasi" name="uyk_senato_karar_numarasi" value="{{ talep.uyk_senato_karar_numarasi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="yok_kadro_talep_yazisi" class="form-label">YÖK Kadro Talep Yazısı</label>
+                                    <input type="text" class="form-control" id="yok_kadro_talep_yazisi" name="yok_kadro_talep_yazisi" value="{{ talep.yok_kadro_talep_yazisi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="yoksis_form_no" class="form-label">YÖKSİS Form No</label>
+                                    <input type="text" class="form-control" id="yoksis_form_no" name="yoksis_form_no" value="{{ talep.yoksis_form_no or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="yok_izin_red_yazisi" class="form-label">YÖK İzin/Red Yazısı</label>
+                                    <input type="text" class="form-control" id="yok_izin_red_yazisi" name="yok_izin_red_yazisi" value="{{ talep.yok_izin_red_yazisi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="yok_onay_durumu" class="form-label">YÖK Onay Durumu</label>
+                                    <select class="form-select select2" id="yok_onay_durumu" name="yok_onay_durumu">
+                                        <option value="">Seçiniz</option>
+                                        {% for durum in yok_onay_durumlari %}
+                                        <option value="{{ durum }}" {% if durum == talep.yok_onay_durumu %}selected{% endif %}>{{ durum }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- İlan ve Atama -->
+                            <h6 class="section-title">
+                                <i class="fas fa-user-plus me-2"></i>
+                                İlan ve Atama
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="ilan_tarihi" class="form-label">İlan Tarihi</label>
+                                    <input type="date" class="form-control" id="ilan_tarihi" name="ilan_tarihi" value="{{ talep.ilan_tarihi or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="adi_soyadi" class="form-label">Adı Soyadı</label>
+                                    <input type="text" class="form-control" id="adi_soyadi" name="adi_soyadi" value="{{ talep.adi_soyadi or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <a href="{{ url_for('kadro_talebi') }}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-1"></i>
+                                    İptal
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>
+                                    Kaydet
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+
+            $('#birim_id').change(function() {
+                var birimId = $(this).val();
+                if (birimId) {
+                    $.get('/get-bolumler/' + birimId, function(data) {
+                        var bolumSelect = $('#bolum_id');
+                        bolumSelect.empty();
+                        bolumSelect.append('<option value="">Bölüm Seçiniz</option>');
+                        data.forEach(function(bolum) {
+                            bolumSelect.append('<option value="' + bolum.id + '">' + bolum.ad + '</option>');
+                        });
+                        bolumSelect.trigger('change');
+                    });
+                }
+            });
+
+            $('#bolum_id').change(function() {
+                var bolumId = $(this).val();
+                if (bolumId) {
+                    $.get('/get-anabilim-dallari/' + bolumId, function(data) {
+                        var anabilimDaliSelect = $('#anabilim_dali_id');
+                        anabilimDaliSelect.empty();
+                        anabilimDaliSelect.append('<option value="">Anabilim Dalı Seçiniz</option>');
+                        data.forEach(function(anabilimDali) {
+                            anabilimDaliSelect.append('<option value="' + anabilimDali.id + '">' + anabilimDali.ad + '</option>');
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+    <style>
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            color: #666;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        body {
+            padding-bottom: 70px; /* Footer'ın yüksekliği kadar padding ekle */
+        }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+    
+    {% if not hide_footer %}
+    <footer>
+        Personel Daire Başkanlığı-2024
+    </footer>
+    {% endif %}
+</body>
+</html>

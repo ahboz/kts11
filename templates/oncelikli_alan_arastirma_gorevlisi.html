@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadro Takip Sistemi - Öncelikli Alan Araştırma Görevlisi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            padding: 0.5rem 1rem;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        #navbarNav {
+            justify-content: center;
+        }
+        .navbar-nav {
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #D94F04;">
+        <div class="container">
+            <span class="navbar-brand text-white">Kadro Takip Sistemi</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('birimler') }}">Birimler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('kadro_talebi') }}">Kadro Talebi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('ozet_cizelge') }}">Özet Çizelge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white active" href="{{ url_for('oncelikli_alan_arastirma_gorevlisi') }}">Öncelikli Alan Araştırma Görevlisi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('raporlar') }}">Raporlar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table me-2"></i>
+                    Öncelikli Alan Araştırma Görevlisi
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Birimler</th>
+                                <th>Cari Yıl Kontenjanı</th>
+                                <th>ÜYKK/Senato Aşamasında</th>
+                                <th>YÖK'ten Onay Bekliyor</th>
+                                <th>YÖK'ten İzin Alındı İlan Edilebilir</th>
+                                <th>İlanda</th>
+                                <th>Atanan</th>
+                                <th style="background-color: #f0f0f0; border-left: 2px solid #dee2e6;"></th>
+                                <th>Cari Yıl Kalan Atama Kontenjanı</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for birim in birimler %}
+                            <tr>
+                                <td>{{ birim.ad }}</td>
+                                <td>{{ kontenjanlar[birim.id] }}</td>
+                                <td>{{ uykk_senato_sayilari[birim.id] }}</td>
+                                <td>{{ yok_onay_bekleyen_sayilari[birim.id] }}</td>
+                                <td>{{ yok_izin_alinan_sayilari[birim.id] }}</td>
+                                <td>{{ ilanda_sayilari[birim.id] }}</td>
+                                <td>{{ atanan_sayilari[birim.id] }}</td>
+                                <td style="background-color: #f0f0f0; border-left: 2px solid #dee2e6;"></td>
+                                <td {% if kalan_kontenjan_sayilari[birim.id] < 0 %}style="color: red"
+                                    {% elif kontenjanlar[birim.id] > 0 and kalan_kontenjan_sayilari[birim.id] == 0 %}style="color: #ffc107; font-weight: bold"{% endif %}>
+                                    {% if kontenjanlar[birim.id] > 0 and kalan_kontenjan_sayilari[birim.id] == 0 %}
+                                        Kalmadı
+                                    {% else %}
+                                        {{ kalan_kontenjan_sayilari[birim.id] }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td><strong>TOPLAM</strong></td>
+                                <td><strong>{{ kontenjanlar.values() | sum }}</strong></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="background-color: #f0f0f0; border-left: 2px solid #dee2e6;"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

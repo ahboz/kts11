@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadro Takip Sistemi - Kadro Talebi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .navbar {
+            padding: 0.5rem 1rem;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        #navbarNav {
+            justify-content: center;
+        }
+        .navbar-nav {
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .form-card {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+        .form-card .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 15px 15px 0 0;
+        }
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 38px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+        .form-select {
+            border: 1px solid #dee2e6;
+        }
+        .btn-icon {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            width: 32px;
+        }
+        .compact-form .row {
+            margin-bottom: 0.5rem;
+        }
+        .compact-form .form-label {
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .compact-form .select2-container {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg" style="background-color: #D94F04;">
+        <div class="container">
+            <span class="navbar-brand text-white">Kadro Takip Sistemi</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('birimler') }}">Birimler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white active" href="{{ url_for('kadro_talebi') }}">Kadro Talebi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('ozet_cizelge') }}">Özet Çizelge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('oncelikli_alan_arastirma_gorevlisi') }}">Öncelikli Alan Araştırma Görevlisi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('raporlar') }}">Raporlar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card form-card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Yeni Kadro Talebi
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('kadro_talebi_ekle') }}" method="post" class="mb-4">
+                            <div class="row g-3">
+                                <!-- Birim Seçimi -->
+                                <div class="col-md-4">
+                                    <label for="birim_id" class="form-label">
+                                        <i class="fas fa-building me-1"></i>
+                                        Birim
+                                    </label>
+                                    <select class="form-select select2" id="birim_id" name="birim_id" required>
+                                        <option value="">Birim Seçiniz</option>
+                                        {% for birim in birimler %}
+                                        <option value="{{ birim.id }}">{{ birim.ad }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Bölüm Seçimi -->
+                                <div class="col-md-4">
+                                    <label for="bolum_id" class="form-label">
+                                        <i class="fas fa-sitemap me-1"></i>
+                                        Bölüm
+                                    </label>
+                                    <select class="form-select select2" id="bolum_id" name="bolum_id" required>
+                                        <option value="">Önce Birim Seçiniz</option>
+                                    </select>
+                                </div>
+
+                                <!-- Anabilim Dalı Seçimi -->
+                                <div class="col-md-4">
+                                    <label for="anabilim_dali_id" class="form-label">
+                                        <i class="fas fa-microscope me-1"></i>
+                                        Anabilim Dalı
+                                    </label>
+                                    <select class="form-select select2" id="anabilim_dali_id" name="anabilim_dali_id" required>
+                                        <option value="">Önce Bölüm Seçiniz</option>
+                                    </select>
+                                </div>
+
+                                <!-- Unvan Seçimi -->
+                                <div class="col-md-4">
+                                    <label for="unvan" class="form-label">
+                                        <i class="fas fa-user-tie me-1"></i>
+                                        Unvan
+                                    </label>
+                                    <select class="form-select select2" id="unvan" name="unvan" required>
+                                        <option value="">Unvan Seçiniz</option>
+                                        {% for unvan in unvanlar %}
+                                        <option value="{{ unvan }}">{{ unvan }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Derece Seçimi -->
+                                <div class="col-md-4">
+                                    <label for="derece" class="form-label">
+                                        <i class="fas fa-layer-group me-1"></i>
+                                        Derece
+                                    </label>
+                                    <select class="form-select select2" id="derece" name="derece" required>
+                                        <option value="">Derece Seçiniz</option>
+                                        {% for i in range(1, 8) %}
+                                        <option value="{{ i }}">{{ i }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Kadro No -->
+                                <div class="col-md-4">
+                                    <label for="kadro_no" class="form-label">
+                                        <i class="fas fa-hashtag me-1"></i>
+                                        Kadro No
+                                    </label>
+                                    <input type="number" class="form-control" id="kadro_no" name="kadro_no" required min="1">
+                                </div>
+
+                                <!-- Kadro Türü -->
+                                <div class="col-md-4">
+                                    <label for="kadro_turu" class="form-label">
+                                        <i class="fas fa-user-graduate me-1"></i>
+                                        Kadro Türü
+                                    </label>
+                                    <select class="form-select select2" id="kadro_turu" name="kadro_turu" required>
+                                        <option value="">Kadro Türü Seçiniz</option>
+                                        {% for tur in kadro_turleri %}
+                                        <option value="{{ tur }}">{{ tur }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Norm Durumu -->
+                                <div class="col-md-4">
+                                    <label for="norm_durumu" class="form-label">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Norm Durumu
+                                    </label>
+                                    <select class="form-select select2" id="norm_durumu" name="norm_durumu" required>
+                                        <option value="">Norm Durumu Seçiniz</option>
+                                        {% for durum in norm_durumlari %}
+                                        <option value="{{ durum }}">{{ durum }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- İşlem Durumu -->
+                                <div class="col-md-4">
+                                    <label for="islem_durumu" class="form-label">
+                                        <i class="fas fa-tasks me-1"></i>
+                                        İşlem Durumu
+                                    </label>
+                                    <select class="form-select select2" id="islem_durumu" name="islem_durumu" required>
+                                        <option value="">İşlem Durumu Seçiniz</option>
+                                        {% for durum in islem_durumlari %}
+                                        <option value="{{ durum }}">{{ durum }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Kaydet Butonu -->
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        Kaydet
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card form-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Kadro Talepleri
+                            </h5>
+                            <a href="{{ url_for('kadro_talepleri_excel') }}" class="btn btn-success">
+                                <i class="fas fa-file-excel me-1"></i>
+                                Excel Raporu
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 100px">İşlemler</th>
+                                        <th style="min-width: 100px;">ID</th>
+                                        <th style="min-width: 150px;">Birim</th>
+                                        <th style="min-width: 150px;">Bölüm</th>
+                                        <th style="min-width: 150px;">Anabilim Dalı</th>
+                                        <th style="min-width: 150px;">Unvan</th>
+                                        <th style="min-width: 100px;">Derece</th>
+                                        <th style="min-width: 100px;">Kadro No</th>
+                                        <th style="min-width: 150px;">Kadro Türü</th>
+                                        <th style="min-width: 100px;">Norm Durumu</th>
+                                        <th style="min-width: 150px;">İşlem Durumu</th>
+                                        <th style="min-width: 150px;">YÖK Onay Durumu</th>
+                                        <th style="min-width: 150px;">Fakülte Yönetim Kurulu Yazısı</th>
+                                        <th style="min-width: 150px;">ÜYK-Senato Talep Yazısı</th>
+                                        <th style="min-width: 150px;">ÜYK-Senato Onay Yazısı</th>
+                                        <th style="min-width: 150px;">ÜYK-Senato Karar Numarası</th>
+                                        <th style="min-width: 150px;">YÖK Kadro Talep Yazısı</th>
+                                        <th style="min-width: 150px;">YÖKSİS Form No</th>
+                                        <th style="min-width: 150px;">YÖK İzin/Red Yazısı</th>
+                                        <th style="min-width: 150px;">İlan Tarihi</th>
+                                        <th style="min-width: 150px;">Adı Soyadı</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for talep in kadro_talepleri %}
+                                    <tr {% if talep.yok_onay_durumu == 'Red' %}class="table-danger"{% endif %}>
+                                        <td>
+                                            <a href="{{ url_for('kadro_talebi_duzenle', talep_id=talep.id) }}" 
+                                               class="btn btn-warning btn-icon" 
+                                               title="Düzenle">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button onclick="silmeyiOnayla({{ talep.id }})" 
+                                                    class="btn btn-danger btn-icon"
+                                                    title="Sil">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td>{{ talep.id }}</td>
+                                        <td>{{ talep.birim.ad }}</td>
+                                        <td>{{ talep.bolum.ad }}</td>
+                                        <td>{{ talep.anabilim_dali.ad }}</td>
+                                        <td>{{ talep.unvan }}</td>
+                                        <td>{{ talep.derece }}</td>
+                                        <td>{{ talep.kadro_no }}</td>
+                                        <td>{{ talep.kadro_turu }}</td>
+                                        <td>{{ talep.norm_durumu }}</td>
+                                        <td>{{ talep.islem_durumu }}</td>
+                                        <td>{{ talep.yok_onay_durumu }}</td>
+                                        <td>{{ talep.fakulte_yonetim_kurulu_yazisi }}</td>
+                                        <td>{{ talep.uyk_senato_talep_yazisi }}</td>
+                                        <td>{{ talep.uyk_senato_onay_yazisi }}</td>
+                                        <td>{{ talep.uyk_senato_karar_numarasi }}</td>
+                                        <td>{{ talep.yok_kadro_talep_yazisi }}</td>
+                                        <td>{{ talep.yoksis_form_no }}</td>
+                                        <td>{{ talep.yok_izin_red_yazisi }}</td>
+                                        <td>{{ talep.ilan_tarihi.strftime('%d.%m.%Y') if talep.ilan_tarihi else '' }}</td>
+                                        <td>{{ talep.adi_soyadi }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Silme Onayı Modal -->
+    <div class="modal fade" id="silmeOnayi" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Silme Onayı</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu kadro talebini silmek istediğinizden emin misiniz?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <form id="silmeFormu" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+
+            $('#birim_id').change(function() {
+                var birimId = $(this).val();
+                if (birimId) {
+                    $.get('/get-bolumler/' + birimId, function(data) {
+                        var bolumSelect = $('#bolum_id');
+                        bolumSelect.empty();
+                        bolumSelect.append('<option value="">Bölüm Seçiniz</option>');
+                        data.forEach(function(bolum) {
+                            bolumSelect.append('<option value="' + bolum.id + '">' + bolum.ad + '</option>');
+                        });
+                        bolumSelect.trigger('change');
+                    });
+                }
+            });
+
+            $('#bolum_id').change(function() {
+                var bolumId = $(this).val();
+                if (bolumId) {
+                    $.get('/get-anabilim-dallari/' + bolumId, function(data) {
+                        var anabilimDaliSelect = $('#anabilim_dali_id');
+                        anabilimDaliSelect.empty();
+                        anabilimDaliSelect.append('<option value="">Anabilim Dalı Seçiniz</option>');
+                        data.forEach(function(anabilimDali) {
+                            anabilimDaliSelect.append('<option value="' + anabilimDali.id + '">' + anabilimDali.ad + '</option>');
+                        });
+                    });
+                }
+            });
+        });
+
+        function silmeyiOnayla(talepId) {
+            var modal = $('#silmeOnayi');
+            var form = modal.find('#silmeFormu');
+            form.attr('action', '/kadro-talebi/sil/' + talepId);
+            modal.modal('show');
+        }
+    </script>
+</body>
+</html>

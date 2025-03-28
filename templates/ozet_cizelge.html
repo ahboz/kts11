@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadro Takip Sistemi - Özet Çizelge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .table-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .table-card .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .navbar {
+            padding: 0.5rem 1rem;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        #navbarNav {
+            justify-content: center;
+        }
+        .navbar-nav {
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #D94F04;">
+        <div class="container">
+            <span class="navbar-brand text-white">Kadro Takip Sistemi</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('index') }}">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('birimler') }}">Birimler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('kadro_talebi') }}">Kadro Talebi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white active" href="{{ url_for('ozet_cizelge') }}">Özet Çizelge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('oncelikli_alan_arastirma_gorevlisi') }}">Öncelikli Alan Araştırma Görevlisi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('raporlar') }}">Raporlar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs mb-4" id="ozetTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="ogretim-uyesi-tab" data-bs-toggle="tab" 
+                                data-bs-target="#ogretim-uyesi" type="button" role="tab">
+                            <i class="fas fa-user-tie me-2"></i>Öğretim Üyesi
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="arastirma-ogretim-tab" data-bs-toggle="tab" 
+                                data-bs-target="#pills-arastirma-ogretim" type="button" role="tab">
+                            <i class="fas fa-user-graduate me-2"></i>Araştırma Görevlisi-Öğretim Görevlisi
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tahsis-tab" data-bs-toggle="tab" 
+                                data-bs-target="#tahsis" type="button" role="tab">
+                            <i class="fas fa-chart-bar me-2"></i>Kontenjan Tahsisi
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="ozetTabContent">
+                    <!-- Öğretim Üyesi Tab -->
+                    <div class="tab-pane fade show active" id="ogretim-uyesi" role="tabpanel">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Birim</th>
+                                        <th>Cari Yıl Kontenjanı</th>
+                                        <th class="table-secondary"></th>
+                                        <th>ÜYKK/Senato Aşamasında</th>
+                                        <th>YÖK'ten Onay Bekliyor</th>
+                                        <th>YÖK'ten İzin Alındı İlan Edilebilir</th>
+                                        <th>İlanda</th>
+                                        <th class="table-secondary"></th>
+                                        <th>Kurum İçinden Atanan</th>
+                                        <th>Kurum Dışından Atanan</th>
+                                        <th class="table-secondary"></th>
+                                        <th>Cari Yıl Kalan Atama Kontenjanı</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for birim in birimler %}
+                                    <tr>
+                                        <td>{{ birim.ad }}</td>
+                                        <td>{{ birim.ogretim_uyesi_sayilari[0].ogretim_uyesi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="table-secondary"></td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].uykk_senato_ogretim_uyesi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].yok_onay_bekleyen_ogretim_uyesi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].yok_izin_alinan_ogretim_uyesi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].ilanda_ogretim_uyesi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="table-secondary"></td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].kurum_ici_atanan_ogretim_uyesi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].kurum_disi_atanan_ogretim_uyesi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="table-secondary"></td>
+                                        <td class="text-center">
+                                            {% if birim.ogretim_uyesi_sayilari %}
+                                                {% set kalan_kontenjan = birim.ogretim_uyesi_sayilari[0].kalan_atama_kontenjani %}
+                                                {% set cari_yil_kontenjani = birim.ogretim_uyesi_sayilari[0].ogretim_uyesi_sayisi %}
+                                                {% if cari_yil_kontenjani > 0 %}
+                                                    {% if kalan_kontenjan < 0 %}
+                                                        <span class="text-danger">{{ kalan_kontenjan }}</span>
+                                                    {% elif kalan_kontenjan == 0 %}
+                                                        <span class="text-warning">Kalmadı</span>
+                                                    {% else %}
+                                                        <span class="text-success">{{ kalan_kontenjan }}</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {{ kalan_kontenjan }}
+                                                {% endif %}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="table-secondary fw-bold">
+                                        <td>Toplam</td>
+                                        <td>{{ toplamlar.ogretim_uyesi }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Araştırma Görevlisi-Öğretim Görevlisi Tab -->
+                    <div class="tab-pane fade" id="pills-arastirma-ogretim" role="tabpanel" aria-labelledby="pills-arastirma-ogretim-tab">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" class="text-center align-middle">Birimler</th>
+                                        <th colspan="2" class="text-center">Cari Yıl Kontenjanı</th>
+                                        <th colspan="2" class="text-center">ÜYKK/Senato Aşamasında</th>
+                                        <th colspan="2" class="text-center">YÖK'ten Onay Bekliyor</th>
+                                        <th colspan="2" class="text-center">YÖK'ten İzin Alındı İlan Edilebilir</th>
+                                        <th colspan="2" class="text-center">İlanda</th>
+                                        <th rowspan="2" class="table-secondary"></th>
+                                        <th colspan="2" class="text-center">Atanan</th>
+                                        <th rowspan="2" class="table-secondary"></th>
+                                        <th colspan="2" class="text-center">Cari Yıl Kalan Atama Kontenjanı</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                        <th class="text-center">Araştırma Görevlisi</th>
+                                        <th class="text-center">Öğretim Görevlisi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for birim in birimler %}
+                                    <tr>
+                                        <td>{{ birim.ad }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].arastirma_gorevlisi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].ogretim_gorevlisi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].uykk_senato_arastirma_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].uykk_senato_ogretim_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].yok_onay_bekleyen_arastirma_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].yok_onay_bekleyen_ogretim_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].yok_izin_alinan_arastirma_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].yok_izin_alinan_ogretim_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].ilanda_arastirma_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].ilanda_ogretim_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="table-secondary"></td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].kurum_disi_atanan_arastirma_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="text-center">{{ birim.ogretim_uyesi_sayilari[0].kurum_disi_atanan_ogretim_gorevlisi if birim.ogretim_uyesi_sayilari else 0 }}</td>
+                                        <td class="table-secondary"></td>
+                                        <td class="text-center">
+                                            {% if birim.ogretim_uyesi_sayilari %}
+                                                {% set kalan_arastirma = birim.ogretim_uyesi_sayilari[0].kalan_arastirma_gorevlisi_kontenjani %}
+                                                {% set kontenjan_arastirma = birim.ogretim_uyesi_sayilari[0].arastirma_gorevlisi_sayisi %}
+                                                {% if kontenjan_arastirma > 0 %}
+                                                    {% if kalan_arastirma < 0 %}
+                                                        <span class="text-danger">{{ kalan_arastirma }}</span>
+                                                    {% elif kalan_arastirma == 0 %}
+                                                        <span class="text-warning">Kalmadı</span>
+                                                    {% else %}
+                                                        {{ kalan_arastirma }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if birim.ogretim_uyesi_sayilari %}
+                                                {% set kalan_ogretim = birim.ogretim_uyesi_sayilari[0].kalan_ogretim_gorevlisi_kontenjani %}
+                                                {% set kontenjan_ogretim = birim.ogretim_uyesi_sayilari[0].ogretim_gorevlisi_sayisi %}
+                                                {% if kontenjan_ogretim > 0 %}
+                                                    {% if kalan_ogretim < 0 %}
+                                                        <span class="text-danger">{{ kalan_ogretim }}</span>
+                                                    {% elif kalan_ogretim == 0 %}
+                                                        <span class="text-warning">Kalmadı</span>
+                                                    {% else %}
+                                                        {{ kalan_ogretim }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="table-secondary">
+                                        <td><strong>TOPLAM</strong></td>
+                                        <td class="text-center"><strong>{{ toplamlar.arastirma_gorevlisi + toplamlar.ogretim_gorevlisi }}</strong></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Kontenjan Tahsisi Tab -->
+                    <div class="tab-pane fade" id="tahsis" role="tabpanel">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Birim</th>
+                                        <th>Öğretim Üyesi</th>
+                                        <th>Araştırma Görevlisi</th>
+                                        <th>Öğretim Görevlisi</th>
+                                        <th>Araştırma Görevlisi(Öncelikli Alan)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for birim in birimler %}
+                                    <tr>
+                                        <td>{{ birim.ad }}</td>
+                                        <td class="editable" data-birim-id="{{ birim.id }}" data-field-type="ogretim_uyesi" ondblclick="duzenlemeyiBaslat(this)">
+                                            {{ birim.ogretim_uyesi_sayilari[0].ogretim_uyesi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}
+                                        </td>
+                                        <td class="editable" data-birim-id="{{ birim.id }}" data-field-type="arastirma_gorevlisi" ondblclick="duzenlemeyiBaslat(this)">
+                                            {{ birim.ogretim_uyesi_sayilari[0].arastirma_gorevlisi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}
+                                        </td>
+                                        <td class="editable" data-birim-id="{{ birim.id }}" data-field-type="ogretim_gorevlisi" ondblclick="duzenlemeyiBaslat(this)">
+                                            {{ birim.ogretim_uyesi_sayilari[0].ogretim_gorevlisi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}
+                                        </td>
+                                        <td class="editable" data-birim-id="{{ birim.id }}" data-field-type="oncelikli_alan_arastirma_gorevlisi" ondblclick="duzenlemeyiBaslat(this)">
+                                            {{ birim.ogretim_uyesi_sayilari[0].oncelikli_alan_arastirma_gorevlisi_sayisi if birim.ogretim_uyesi_sayilari else 0 }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="table-secondary fw-bold">
+                                        <td>Toplam</td>
+                                        <td>{{ toplamlar.ogretim_uyesi }}</td>
+                                        <td colspan="2" class="text-center">{{ toplamlar.arastirma_gorevlisi + toplamlar.ogretim_gorevlisi }}</td>
+                                        <td>{{ toplamlar.oncelikli_alan_arastirma_gorevlisi }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Aktif sekmeyi localStorage'da sakla
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                localStorage.setItem('activeTab', this.getAttribute('data-bs-target'));
+            });
+        });
+
+        // Sayfa yüklendiğinde son aktif sekmeyi göster
+        document.addEventListener('DOMContentLoaded', function() {
+            const activeTab = localStorage.getItem('activeTab');
+            if (activeTab) {
+                const tab = new bootstrap.Tab(document.querySelector(`[data-bs-target="${activeTab}"]`));
+                tab.show();
+            }
+        });
+
+        function duzenlemeyiBaslat(hucre) {
+            const mevcutDeger = hucre.textContent.trim();
+            const birimId = hucre.dataset.birimId;
+            const fieldType = hucre.dataset.fieldType;
+            
+            // Input oluştur
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.value = mevcutDeger;
+            input.className = 'form-control form-control-sm';
+            input.min = '0';
+            
+            // Mevcut içeriği sakla
+            const eskiIcerik = hucre.innerHTML;
+            
+            // Input'u hücreye ekle
+            hucre.innerHTML = '';
+            hucre.appendChild(input);
+            input.focus();
+            
+            // Input olaylarını ekle
+            input.onblur = () => duzenlemeiBitir(hucre, input, eskiIcerik, birimId, fieldType);
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            };
+        }
+
+        function duzenlemeiBitir(hucre, input, eskiIcerik, birimId, fieldType) {
+            const yeniDeger = parseInt(input.value) || 0;
+            
+            // Aktif sekmeyi sakla
+            const activeTab = document.querySelector('.tab-pane.active').id;
+            
+            // API'ye gönder
+            fetch('/guncelle_ogretim_uyesi_sayisi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    birim_id: birimId,
+                    field_type: fieldType,
+                    new_value: yeniDeger
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    hucre.innerHTML = yeniDeger;
+                    // URL'e aktif sekmeyi ekleyerek sayfayı yenile
+                    window.location.href = window.location.pathname + '#' + activeTab;
+                    window.location.reload();
+                } else {
+                    hucre.innerHTML = eskiIcerik;
+                    alert('Güncelleme başarısız: ' + data.error);
+                }
+            })
+            .catch(error => {
+                hucre.innerHTML = eskiIcerik;
+                alert('Güncelleme sırasında bir hata oluştu');
+            });
+        }
+    </script>
+{% endblock %}
